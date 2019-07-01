@@ -3,7 +3,7 @@ const fs=require('fs')
 
 var app=express()
 
-app.get('/',function (req,res) {
+app.get('/fights',function (req,res) {
   let cont=fs.readFileSync('/tmp/tkd_json/30964327.json')
   if(cont){
     let cjson=JSON.parse(cont)
