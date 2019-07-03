@@ -4,7 +4,7 @@ const fs=require('fs')
 var app=express()
 
 app.get('/fights',function (req,res) {
-  let cont=fs.readFileSync('/tmp/tkd_json/30964327.json')
+  let cont=fs.readFileSync('/var/opt/tkd_json/30964327.json')
   if(cont){
     let cjson=JSON.parse(cont)
     console.log('file', cjson)
