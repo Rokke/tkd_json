@@ -3,11 +3,13 @@ const fs=require('fs')
 
 var app=express()
 
-app.get('/fights',function (req,res) {
-  let cont=fs.readFileSync('/var/opt/tkd_json/30964327.json')
+app.get('/fights/:tpss/:date',function (req,res) {
+	console.log("[%s] TPSS fights: %j",req.originalUrl,req.params)
+	let filename='/var/opt/tkd_json/'+req.params.tpss+'_'+req.params.date+'.json'
+  let cont=fs.readFileSync(filename)
   if(cont){
     let cjson=JSON.parse(cont)
-    console.log(req.originalUrl,cjson.fights,cjson.date)
+    console.log(req.originalUrl,cjson.fights.length,cjson.date)
     res.json(cjson)
   }else res.sendStatus(500)
 })
