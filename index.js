@@ -1,52 +1,46 @@
 var express=require('express')
 const fs=require('fs')
-
+const logger =require('./winston.js') 
+const CACHE_PATH='/var/opt/tkd_json/'
 var app=express()
 
+app.use(function(req, res, next) {
+  logger.info("%s,%j,%j,%j",req.originalUrl,req.socket._peername,req.params,req.headers)
+  next()
+})
 app.get('/fights/:tpss/:date',function (req,res) {
-	console.log("[%s] TPSS fights: %j, %j",req.originalUrl,req.params,req.body)
-	let filename='/var/opt/tkd_json/'+req.params.tpss+'_'+req.params.date+'.json'
-  let cont=fs.readFileSync(filename)
+	logger.info("[%s] TPSS fights feil: %j, %j",req.originalUrl,req.params,req.body)
+	let filename=`${CACHE_PATH}${req.params.tpss}'_'${req.params.date}.json`
+	if(fs.existsSync(filename))
+  var cont=fs.readFileSync(filename)
   if(cont){
     let cjson=JSON.parse(cont)
-    console.log(req.originalUrl,cjson.fights.length,cjson.date)
+    logger.info(req.originalUrl,cjson.fights.length,cjson.date)
     res.json(cjson)
-  }else res.sendStatus(500)
-})
-app.get('/fights',function (req,res) {
-	console.log("[%s] TPSS fights feil: %j, %j",req.originalUrl,req.params,req.body)
-	let filename='/var/opt/tkd_json/'+req.params.tpss+'_'+req.params.date+'.json'
-  let cont=fs.readFileSync(filename)
-  if(cont){
-    let cjson=JSON.parse(cont)
-    console.log(req.originalUrl,cjson.fights.length,cjson.date)
-    res.json(cjson)
-  }else res.sendStatus(500)
-})
-app.put('/fights',function (req,res) {
-	console.log("[%s] TPSS fights put: %j, %j",req.originalUrl,req.params,req.body)
-	let filename='/var/opt/tkd_json/'+req.body.tpss+'_'+req.body.date+'.json'
-  let cont=fs.readFileSync(filename)
-  if(cont){
-    let cjson=JSON.parse(cont)
-    console.log(req.originalUrl,cjson.fights.length,cjson.date)
-    res.json(cjson)
-  }else res.sendStatus(500)
+	}else{
+		logger.error("[%s] invalid fight request %j",req.originalUrl,req.params)
+		res.sendStatus(500)
+	}
 })
 app.get('/tournaments',function (req,res) {
-	console.log("[%s] TPSS fights: %j",req.originalUrl,req.params)
-  let cont=fs.readFileSync('/var/opt/tkd_json/tournaments.json')
-  if(cont){
-    let cjson=JSON.parse(cont)
-    console.log(req.originalUrl,cjson.tournaments,cjson.date)
-    res.json(cjson)
-  }else res.sendStatus(500)
+	let filename=`${CACHE_PATH}tournaments.json`
+	logger.info("[%s] TPSS fights: %j",req.originalUrl,req.params,filename)
+	if(fs.existsSync(filename)){
+		let cont=fs.readFileSync(filename)
+		if(cont){
+			let cjson=JSON.parse(cont)
+			logger.info(req.originalUrl,cjson.tournaments,cjson.date)
+			res.json(cjson)
+		}else res.sendStatus(500)
+	}else{
+		logger.error("Error no tournament file")
+	}
 })
 app.get('/',function (req,res) {
-	console.log("[%s] unknown params: %j, body: %j",req.originalUrl,req.params,req.body)
+	logger.error("[%s] unknown params: %j, body: %j",req.originalUrl,req.params,req.body)
 	res.sendStatus(500)
 })
 
 app.listen(process.env.PORT || 3000,function(){
-  console.log('Lytter til port 3000!')
+	logger.info('Lytter til port 3000!', CACHE_PATH)
 })
