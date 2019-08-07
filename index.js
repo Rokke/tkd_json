@@ -41,7 +41,7 @@ app.get('/state',function (req,res) {
 	logger.info("[%s] state: %j",req.originalUrl,req.params)
 	let stat=fs.statSync(filename)
 	logger.info("[%s] modified: %d",req.originalUrl,stat.mtimeMs)
-	res.json({modified: stat.mtimeMs})
+	res.json(stat.mtimeMs)
 })
 app.get('/tournaments',function (req,res) {
 	let filename=`${CACHE_PATH}tournaments.json`
