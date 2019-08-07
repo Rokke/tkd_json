@@ -38,14 +38,14 @@ app.get('/competitors/:key',function (req,res) {
 })
 app.get('/state',function (req,res) {
 	let filename=`${CACHE_PATH}tournaments.json`
-	logger.info("[%s] state: %j",req.originalUrl,req.params,filename)
+	logger.info("[%s] state: %j",req.originalUrl,req.params)
 	let stat=fs.statSync(filename)
-	logger.info("[%s] modified: %d",stat.mtimeMs)
-	res.json(stat.mtimeMs)
+	logger.info("[%s] modified: %d",req.originalUrl,stat.mtimeMs)
+	res.json({modified: stat.mtimeMs})
 })
 app.get('/tournaments',function (req,res) {
 	let filename=`${CACHE_PATH}tournaments.json`
-	logger.info("[%s] TPSS fights: %j",req.originalUrl,req.params,filename)
+	logger.info("[%s] tournaments: %j",req.originalUrl,req.params,filename)
 	if(fs.existsSync(filename)){
 		let cont=fs.readFileSync(filename)
 		if(cont){
