@@ -1,8 +1,11 @@
 var express=require('express')
+var bodyParser = require("body-parser") 
 const fs=require('fs')
 const logger =require('./winston.js') 
 const CACHE_PATH='/var/opt/tkd_json/'
 var app=express()
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true })) 
 
 app.use(function(req, res, next) {
   logger.info("%s,%j,%j,%j",req.originalUrl,req.socket._peername,req.params,req.headers)
@@ -43,6 +46,13 @@ app.get('/state',function (req,res) {
 	logger.info("[%s] modified: %d",req.originalUrl,stat.mtimeMs)
 	res.json(stat.mtimeMs)
 })
+app.post("/addnew", function(req,res){
+	logger.info("[%s] %j %j",req.originalUrl,req.body,req.body.monitor)
+	let filename=`${CACHE_PATH}add/${req.body.name}.json`
+	fs.writeFileSync(filename, JSON.stringify(req.body.monitor))
+	res.sendStatus(200)
+})
+
 app.get('/tournaments',function (req,res) {
 	let filename=`${CACHE_PATH}tournaments.json`
 	logger.info("[%s] tournaments: %j",req.originalUrl,req.params,filename)
