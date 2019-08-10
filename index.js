@@ -28,12 +28,13 @@ app.get('/fights/:key/:date',function (req,res) {
 app.get('/competitors/:key',function (req,res) {
 	logger.info("[%s] competitors: %j, %j",req.originalUrl,req.params,req.body)
 	let filename=`${CACHE_PATH}competitors/${req.params.key}.json`
-	if(fs.existsSync(filename))
-  var cont=fs.readFileSync(filename)
-  if(cont){
-    let cjson=JSON.parse(cont)
-    logger.info(req.originalUrl,cjson.competitors.length,cjson.date)
-    res.json(cjson)
+	if(fs.existsSync(filename)){
+		let cont=fs.readFileSync(filename)
+		if(cont){
+			let cjson=JSON.parse(cont)
+			logger.info("[%s] divisions: %d",req.originalUrl,cjson.divisions.length)
+			res.json(cjson)
+		}
 	}else{
 		logger.error("[%s] invalid competitors request %j",req.originalUrl,req.params)
 		res.sendStatus(500)
@@ -45,6 +46,12 @@ app.get('/state',function (req,res) {
 	let stat=fs.statSync(filename)
 	logger.info("[%s] modified: %d",req.originalUrl,stat.mtimeMs)
 	res.json(stat.mtimeMs)
+})
+app.get('/currentMonitor',function (req,res) {
+	logger.info("[%s] currentMonitor: %j",req.originalUrl,req.params)
+	let filename=`${CACHE_PATH}monitor.json`
+	if(fs.existsSync(filename)) res.json(JSON.parse(fs.readFileSync(filename)))
+	else res.sendStatus(500)
 })
 app.post("/addnew", function(req,res){
 	logger.info("[%s] %j %j",req.originalUrl,req.body,req.body.monitor)
