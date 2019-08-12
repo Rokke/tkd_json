@@ -13,15 +13,16 @@ app.use(function(req, res, next) {
 })
 app.get('/fights/:key/:date',function (req,res) {
 	logger.info("[%s] fights: %j, %j",req.originalUrl,req.params,req.body)
-	let filename=`${CACHE_PATH}fights/${req.params.key}'_'${req.params.date}.json`
-	if(fs.existsSync(filename))
-  var cont=fs.readFileSync(filename)
-  if(cont){
-    let cjson=JSON.parse(cont)
-    logger.info(req.originalUrl,cjson.fights.length,cjson.date)
-    res.json(cjson)
+	let filename=`${CACHE_PATH}fights/${req.params.key}_${req.params.date}.json`
+	if(fs.existsSync(filename)){
+		var cont=fs.readFileSync(filename)
+		if(cont){
+			let cjson=JSON.parse(cont)
+			logger.info(req.originalUrl,cjson.fights.length,cjson.date)
+			res.json(cjson)
+		}
 	}else{
-		logger.error("[%s] invalid fight request %j",req.originalUrl,req.params)
+		logger.error("[%s] invalid fight request %s",req.originalUrl,filename)
 		res.sendStatus(500)
 	}
 })
