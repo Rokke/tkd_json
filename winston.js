@@ -16,9 +16,9 @@ var logger=createLogger({
 	transports: [
 		new (winston.transports.DailyRotateFile)({
 			filename: `${LOG_PATH}logs/tkdjson_%DATE%.log`,
-			datePattern: 'YYYY-MM-DD-HH',
+			datePattern: 'YYYY-MM-DD',
 			zippedArchive: true,
-			maxSize: '2m',
+			maxSize: '4m',
 			maxFiles: '14d'
 		}),
     new transports.File({
