@@ -80,6 +80,12 @@ app.get('/',function (req,res) {
 	logger.error("[%s] unknown params: %j, body: %j",req.originalUrl,req.params,req.body)
 	res.sendStatus(500)
 })
+app.post("/sendDeviceLog", function(req,res){
+	logger.info("[%s] %j %j",req.originalUrl,req.body,req.body.monitor)
+	let filename=`${CACHE_PATH}clientlogs/${req.body.fromUser}.gz`
+	fs.writeFileSync(filename, req.body.logText)
+	res.sendStatus(200)
+})
 app.listen(process.env.PORT || 3000,function(){
 	logger.info('Lytter til port 3000!', CACHE_PATH)
 })
