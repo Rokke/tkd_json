@@ -1,4 +1,5 @@
 var express=require('express')
+const formidable = require('formidable')
 var bodyParser = require("body-parser") 
 const fs=require('fs')
 const logger =require('./winston.js') 
@@ -81,10 +82,16 @@ app.get('/',function (req,res) {
 	res.sendStatus(500)
 })
 app.post("/sendDeviceLog", function(req,res){
-	logger.info("[%s] %s",req.originalUrl.req.headers["user-agent"])
-	let filename=`${CACHE_PATH}clientlogs/${req.headers["user-agent"]}.gz`
-	fs.writeFileSync(filename, req.body.logText)
-	res.sendStatus(200)
+	logger.info("[%s]",req.originalUrl)
+	new formidable.IncomingForm().parse(req, (err,fields,files)=>{
+		if(err){
+			logger.error('Error', err)
+			res.sendStatus(500)
+		}else res.sendStatus(200)
+	}).on('fileBegin', (name, file) =>{
+		logger.info('Created %s: %s', name, file.name)
+		file.path = `${CACHE_PATH}clientlogs/${file.name}.gz`
+	})
 })
 app.listen(process.env.PORT || 3000,function(){
 	logger.info('Lytter til port 3000!', CACHE_PATH)
