@@ -81,8 +81,8 @@ app.get('/',function (req,res) {
 	res.sendStatus(500)
 })
 app.post("/sendDeviceLog", function(req,res){
-	logger.info("[%s] %s",req.originalUrl.req.body.fromUser)
-	let filename=`${CACHE_PATH}clientlogs/${req.body.fromUser}.gz`
+	logger.info("[%s] %s",req.originalUrl.req.headers["user-agent"])
+	let filename=`${CACHE_PATH}clientlogs/${req.headers["user-agent"]}.gz`
 	fs.writeFileSync(filename, req.body.logText)
 	res.sendStatus(200)
 })
