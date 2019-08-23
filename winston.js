@@ -27,6 +27,6 @@ var logger=createLogger({
   ],
   exitOnError: false
 })
-logger.info('Log started %j', process.env)
+logger.info('Log started %j, %s, %s-%s', process.env, process.env.DBPWD, process.env.PWD, process.env.PORT)
 
 module.exports=logger
