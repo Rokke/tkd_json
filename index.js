@@ -44,6 +44,22 @@ app.get('/competitors/:key',function (req,res) {
 		res.sendStatus(500)
 	}
 })
+app.get('/clientlogs/:file?',function (req,res) {
+	logger.info("[%s] clientlogs: %j",req.originalUrl,req.params)
+	let filepath=`${CACHE_PATH}clientlogs`
+	logger.info("[%s] clientlogs: %s",req.originalUrl,filepath)
+	if(req.params.file){
+		res.sendFile(`${filepath}/${req.params.file}`)
+	}else{
+		let files=fs.readdirSync(filepath)
+		let j=[]
+		for(let i=0;i<files.length;i++){
+			j.push({'name':files[i], 'url':`clientlogs/${files[i]}`})
+		}
+		logger.info("[%s] logs: %j",req.originalUrl,j)
+		res.json(j)
+	}
+})
 app.get('/state',function (req,res) {
 	let filename=`${CACHE_PATH}tournaments.json`
 	logger.info("[%s] state: %j",req.originalUrl,req.params)

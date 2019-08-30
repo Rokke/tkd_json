@@ -33,4 +33,18 @@ router.get("/searchfights/:tournamentid/:personid", function(req, res) {
 		res.status(200).json(result)
 	})
 })*/
+router.get("/fetchlinks/:personid", function(req, res){
+  logger.info("[%s] %j",req.originalUrl,req.params)
+  Database.sql_executeAndClose("SELECT l.tournament,t.tournamentname,l.id,l.blueperson,pb.fullname as bluefullname,l.redperson,pr.fullname as redfullname,l.link,l.tournament,l.fight,l.comment FROM fight_videos l LEFT JOIN tournaments t ON t.id=l.tournament LEFT JOIN persons pb ON pb.id=l.blueperson LEFT JOIN persons pr ON pr.id=l.redperson WHERE l.redperson=? OR l.blueperson=?",[req.params.personid,req.params.personid]).then(result=>{
+		res.status(200).json(result)
+	})
+})
+router.get("/:tournamentid/classes/:classid", function(req, res) {
+  logger.info("[%s] %j",req.originalUrl,req.params)
+  if (req.params.classid && req.params.tournamentid){
+		Database.sql_executeSendJSONAndClose("CALL searchClassFights(?,?,null)",[req.params.tournamentid,req.params.classid]).then(result=>{
+			res.status(200).json(result)
+		})
+  }else res.sendStatus(500)
+})
 module.exports = router
