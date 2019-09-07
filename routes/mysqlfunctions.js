@@ -43,7 +43,7 @@ router.get("/:tournamentid/classes/:classid", function(req, res) {
   logger.info("[%s] %j",req.originalUrl,req.params)
   if (req.params.classid && req.params.tournamentid){
 		Database.sql_executeAndClose("CALL searchClassFights(?,?,null)", [req.params.tournamentid, req.params.classid]).then(result => {
-			res.status(200).json(result)
+			res.status(200).json(result[0])
 		})
   }else res.sendStatus(500)
 })
