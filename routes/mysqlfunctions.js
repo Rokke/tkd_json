@@ -40,9 +40,9 @@ router.get("/fetchlinks/:personid", function(req, res){
 	})
 })
 router.get("/:tournamentid/classes/:classid", function(req, res) {
-  logger.info("[%s] %j",req.originalUrl,req.params)
+  logger.info("[%s] %j", req.originalUrl, req.params)
   if (req.params.classid && req.params.tournamentid){
-		Database.sql_executeAndClose("CALL searchClassFights(?,?,null)", [req.params.tournamentid, req.params.classid]).then(result => {
+		Database.sql_executeAndClose("CALL searchClassFights(?,?,?)", [req.params.tournamentid, req.params.classid, req.headers.userid]).then(result => {
 			res.status(200).json(result[0])
 		})
   }else res.sendStatus(500)
