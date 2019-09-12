@@ -14,7 +14,7 @@ router.get("/searchtournaments/:personid", function(req, res){
 })
 router.post("/searchname", function(req, res) {
   logger.info("[%s] %j",req.originalUrl,req.body)
-  Database.sql_executeAndClose("CALL searchForSimilarPersons(?,null)",[req.body.fullname]).then(result=>{
+  Database.sql_executeAndClose("CALL searchForSimilarPersons(?,?)", [req.body.fullname, req.headers.userid]).then(result => {
 		res.status(200).json(result[0])
 	}).catch(err=>{
 		logger.warn("DB sql_executeAndClose, Exception: %j", err)
@@ -56,5 +56,21 @@ router.get("/fetchuser", function (req, res) {
       else res.status(202).json(0)
     })
   } else res.status(500).json(0)
+})
+router.get("/togglewatch/:personid/:on?", function (req, res) {
+  logger.info("[%s] %j", req.originalUrl, req.params)
+  if (req.headers.userid>0) {
+    if (req.params.on){
+      Database.sql_executeAndClose("INSERT INTO user_watchlist(watchid,userid,watchtype)VALUES(?,?,1)", [req.params.personid, req.headers.userid]).then(data=>{
+        logger.info("[%s] INSERT %j", req.originalUrl, data)
+        res.status(200).json(data.insertId)
+      })
+    }else{
+      Database.sql_executeAndClose("DELETE FROM user_watchlist WHERE watchtype=1 AND watchid=? AND userid=?", [req.params.personid, req.headers.userid]).then(data=>{
+        logger.info("[%s] DELETE %j", req.originalUrl, data)
+        res.sendStatus(200)
+      })
+    }
+  } else res.sendStatus(500)
 })
 module.exports = router
