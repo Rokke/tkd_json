@@ -54,7 +54,10 @@ app.get('/clientlogs/:file?',function (req,res) {
 		let files=fs.readdirSync(filepath)
 		let j=[]
 		for(let i=0;i<files.length;i++){
-			j.push({'name':files[i], 'url':`clientlogs/${files[i]}`})
+			j.push({
+			      'name': files[i],
+			      'modified': fs.statSync(`${filepath}/${files[i]}`).mtime
+			      })
 		}
 		logger.info("[%s] logs: %j",req.originalUrl,j)
 		res.json(j)
