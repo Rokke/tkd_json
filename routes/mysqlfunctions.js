@@ -21,6 +21,33 @@ router.post("/searchname", function(req, res) {
 		res.sendStatus(500)
 	})
 })
+router.post("/tournament/search", function (req, res) {
+  logger.info("[%s] %j", req.originalUrl, req.body)
+  Database.sql_executeAndClose("SELECT * FROM tournaments WHERE showtournament IN ('S','*') AND tournamentname LIKE ? ORDER BY tournamentname", '%' + req.body.tournamentname + '%').then(result => {
+    res.status(200).json(result)
+  }).catch(err => {
+    logger.warn("[%s] DB sql_executeAndClose, Exception: %j", req.originalUrl, err)
+    res.sendStatus(500)
+  })
+})
+router.get("/tournament/:tournamentid/fetchclasses", function (req, res) {
+  logger.info("[%s] %j", req.originalUrl, req.params)
+  Database.sql_executeAndClose("SELECT rc.tournament, rc.classid, c.simplycompete as sc_class, count(*) as rounds, MAX(rc.modified) as modified FROM round_classes rc INNER JOIN classes c ON c.id=rc.classid WHERE rc.tournament=? GROUP BY rc.tournament, rc.classid, sc_class", req.params.tournamentid).then(result => {
+    res.status(200).json(result)
+  }).catch(err => {
+    logger.warn("[%s] DB sql_executeAndClose, Exception: %j", req.originalUrl, err)
+    res.sendStatus(500)
+  })
+})
+/*router.get("/static/classes/:lastupdate", function (req, res) {
+  logger.info("[%s] %j", req.originalUrl, req.params)
+  Database.sql_executeAndClose("SELECT * FROM classes WHERE modified>?", req.params.lastupdate).then(result => {
+    res.status(200).json(result)
+  }).catch(err => {
+    logger.warn("[%s] DB sql_executeAndClose, Exception: %j", req.originalUrl, err)
+    res.sendStatus(500)
+  })
+})*/
 router.get("/searchfights/:tournamentid/:personid", function(req, res) {
   logger.info("[%s] %j",req.originalUrl,req.params)
   Database.sql_executeAndClose("SELECT f.id, p1.id as blueid, p1.fullname as bluename, p2.id as redid, p2.fullname as redname,f.roundno,f.result,f.points,f.winner,r.roundname FROM fights f INNER JOIN round_classes r ON r.id=f.round_class INNER JOIN persons p1 ON p1.id=f.blueperson INNER JOIN persons p2 ON p2.id=f.redperson WHERE r.tournament=? AND (p1.id=? OR p2.id=?)",[req.params.tournamentid,req.params.personid,req.params.personid]).then(result=>{
