@@ -32,7 +32,7 @@ router.post("/tournament/search", function (req, res) {
 })
 router.get("/tournament/:tournamentid/fetchclasses", function (req, res) {
   logger.info("[%s] %j", req.originalUrl, req.params)
-  Database.sql_executeAndClose("SELECT rc.tournament, rc.classid, c.simplycompete as sc_class, count(*) as rounds, MAX(rc.modified) as modified FROM round_classes rc INNER JOIN classes c ON c.id=rc.classid WHERE rc.tournament=? GROUP BY rc.tournament, rc.classid, sc_class", req.params.tournamentid).then(result => {
+  Database.sql_executeAndClose("SELECT rc.tournament, rc.classid, c.simplycompete as sc_class, count(*) as rounds, MAX(rc.modified) as modified FROM round_classes rc INNER JOIN classes c ON c.id=rc.classid WHERE rc.tournament=? GROUP BY rc.tournament, rc.classid, sc_class order by rc.tournament, sc_class", req.params.tournamentid).then(result => {
     res.status(200).json(result)
   }).catch(err => {
     logger.warn("[%s] DB sql_executeAndClose, Exception: %j", req.originalUrl, err)
@@ -100,4 +100,17 @@ router.get("/togglewatch/:personid/:on?", function (req, res) {
     }
   } else res.sendStatus(500)
 })
+router.post("/links/update", function (req, res) {
+  logger.info("[%s] %j", req.originalUrl, req.body)
+  if (req.headers.userid>0) {
+    if (req.body.id) {
+      let sql = Database.sql_BuildUpdateArgs("fight_videos", req.body, ['blueperson', 'redperson', 'tournament', 'fight', 'comment', 'link'], "id=" + req.body.id)
+      logger.info("[%s] SQL:%j", req.originalUrl, sql)
+//      Database.sql_executeAndClose(sql.sql, sql.args).then(data=>{})
+    } else Database.sql_executeAndClose("INSERT INTO fight_videos(blueperson,redperson,tournament,fight,comment,link)VALUES(?,?,?,?,?,?)", [req.body.blueperson, req.body.redperson, req.body.tournament, req.body.fight, req.body.comment, req.body.link]).then(data=>{
+      res.status(200).json(data.insertId)
+    })
+  } else res.sendStatus(500)
+})
+
 module.exports = router
