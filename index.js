@@ -64,8 +64,9 @@ app.get('/clientlogs/:file?',function (req,res) {
 	}
 })
 app.get('/state',function (req,res) {
-	let filename=`${CACHE_PATH}tournaments.json`
-	logger.info("[%s] state: %j",req.originalUrl,req.params)
+  let filename=`${CACHE_PATH}tournaments.json`
+  let heads = req.headers["user-agent"].split("/")
+	logger.info("[%s] state(%s): %j",req.originalUrl,heads[heads.length-1],req.params)
 	let stat=fs.statSync(filename)
 	logger.info("[%s] modified: %d",req.originalUrl,stat.mtimeMs)
 	res.json(stat.mtimeMs)
