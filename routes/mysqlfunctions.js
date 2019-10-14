@@ -78,11 +78,17 @@ router.get("/fetchuser", function (req, res) {
   logger.info("[%s] %j", req.originalUrl, req.params)
   if(req.headers.username){
     Database.sql_executeAndClose("SELECT id FROM users where email=?", [req.headers.username]).then(result => {
-      logger.info("[%s] %j %d - %s", req.originalUrl, result, req.headers.username)
+      logger.info("[%s] %j - %s", req.originalUrl, result, req.headers.username)
       if (result[0] && result[0].id>0) res.status(200).json(result[0].id)
-      else res.status(202).json(0)
+      else{
+        logger.error("[%s] New user not added: %s", req.originalUrl, req.headers.username)
+        res.status(202).json(0)
+      }
     })
-  } else res.status(500).json(0)
+  } else{
+    logger.error("[%s] Invalid user: %j", req.originalUrl, req.headers)
+    res.status(500).json(0)
+  }
 })
 router.get("/togglewatch/:personid/:on?", function (req, res) {
   logger.info("[%s] %j", req.originalUrl, req.params)
