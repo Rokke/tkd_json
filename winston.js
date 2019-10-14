@@ -18,7 +18,7 @@ var logger=createLogger({
 			filename: `${LOG_PATH}logs/tkdjson_%DATE%.log`,
 			datePattern: 'YYYY-MM-DD',
 			zippedArchive: true,
-			maxFiles: '9d'
+			maxFiles: '8d'
 		}),
     new transports.File({
       level: 'error', filename: `${LOG_PATH}logs/err_tkdjson.log`, handleExceptions: true, json: true, maxsize: 542880, colorize: false
