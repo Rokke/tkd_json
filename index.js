@@ -78,11 +78,12 @@ app.get('/currentMonitor',function (req,res) {
 	else res.sendStatus(500)
 })
 app.post("/addnew", function(req,res){
-	logger.info("[%s] %j %j",req.originalUrl,req.body,req.body.monitor)
-	if(!req.body.name) req.body.name=`${req.headers["username"]}_${new Date().getTime()}`
-	let filename=`${CACHE_PATH}add/${req.body.name}.json`
-	fs.writeFileSync(filename, JSON.stringify(req.body))
-	res.sendStatus(200)
+  logger.info("[%s] %j",req.originalUrl,req.body)
+  if (req.body.monitor){
+    let filename = `${CACHE_PATH}add/${req.headers["username"]}_${new Date().getTime()}.json`
+    fs.writeFileSync(filename, JSON.stringify(req.body.monitor))
+    res.sendStatus(200)
+  }else res.sendStatus(500)
 })
 
 app.get('/tournaments',function (req,res) {
