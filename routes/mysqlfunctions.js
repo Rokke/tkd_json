@@ -74,6 +74,22 @@ router.get("/:tournamentid/classes/:classid", function(req, res) {
 		})
   }else res.sendStatus(500)
 })
+router.get("/usergroups", function (req, res) {
+  logger.info("[%s] %j", req.originalUrl, req.params)
+  if (req.headers.username && req.headers.userid) {
+    Database.sql_executeAndClose("SELECT ug.groupid FROM users_to_groups ug INNER JOIN users u ON u.id=ug.userid where u.email=? and u.id=?", [req.headers.username, req.headers.userid]).then(result => {
+      logger.info("[%s] %j - %s, %d", req.originalUrl, result, req.headers.username, req.headers.userid)
+      if (result && result.length > 0) res.status(200).json(result.map(m => m.groupid))
+      else {
+        logger.error("[%s] No group exist: %s", req.originalUrl, req.headers.username)
+        res.sendStatus(202)
+      }
+    })
+  } else {
+    logger.error("[%s] Invalid user: %j", req.originalUrl, req.headers)
+    res.sendStatus(500)
+  }
+})
 router.get("/fetchuser", function (req, res) {
   logger.info("[%s] %j", req.originalUrl, req.params)
   if(req.headers.username){
