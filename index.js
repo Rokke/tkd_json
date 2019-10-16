@@ -11,7 +11,7 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true })) 
 app.use("/db", mysqlfunctions)
 app.use(function(req, res, next) {
-  logger.info("%s,%j,%j,%j",req.originalUrl,req.socket._peername,req.params,req.headers)
+  logger.info("%s,%j,%j",req.originalUrl,req.params,req.headers)
   next()
 })
 app.get('/fights/:key/:date',function (req,res) {
@@ -79,7 +79,7 @@ app.get('/currentMonitor',function (req,res) {
 })
 app.post("/addnew", function(req,res){
 	logger.info("[%s] %j %j",req.originalUrl,req.body,req.body.monitor)
-	if(!req.body.name) req.body.name=`${req.headers["user-agent"].split('/')[0]}_${new Date().getTime()}`
+	if(!req.body.name) req.body.name=`${req.headers["username"]}_${new Date().getTime()}`
 	let filename=`${CACHE_PATH}add/${req.body.name}.json`
 	fs.writeFileSync(filename, JSON.stringify(req.body.monitor))
 	res.sendStatus(200)
