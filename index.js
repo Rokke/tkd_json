@@ -1,6 +1,6 @@
 var express=require('express')
-var cors=require('cors')
-var router=express.Router()
+const cors=require('cors')
+//var router=express.Router()
 const formidable = require('formidable')
 var bodyParser = require("body-parser") 
 const fs=require('fs')
@@ -8,9 +8,9 @@ const logger =require('./winston.js')
 const mysqlfunctions=require('./routes/mysqlfunctions.js')
 const CACHE_PATH='/var/opt/tkd_json/'
 var app=express()
+app.use(cors({origin: 'http://*'}))    // This is to allow connection from webapps
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true })) 
-app.use(cors);    // This is to allow connection from webapps
 app.use("/db", mysqlfunctions)
 app.use(function(req, res, next) {
   logger.info("%s,%j,%j",req.originalUrl,req.params,req.headers)
