@@ -13,7 +13,7 @@ router.get("/searchtournaments/:personid", function(req, res){
 	})
 })
 router.post("/searchname", function(req, res) {
-  logger.info("[%s] %j",req.originalUrl,req.body)
+  logger.info("[%s] %j => %j", req.originalUrl, req.body, req.headers)
   Database.sql_executeAndClose("CALL searchForSimilarPersons(?,?)", [req.body.fullname, req.headers.userid]).then(result => {
 		res.status(200).json(result[0])
 	}).catch(err=>{
